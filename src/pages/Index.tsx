@@ -4,7 +4,7 @@ import { StyleSelector } from "@/components/StyleSelector";
 import { GenerateButton } from "@/components/GenerateButton";
 import { ImageGrid } from "@/components/ImageGrid";
 import { ModeToggle } from "@/components/ModeToggle";
-import { SurpriseMeButton, surprisePrompts } from "@/components/SurpriseMeButton";
+import { SurpriseMeButton } from "@/components/SurpriseMeButton";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Sparkles } from "lucide-react";
@@ -64,9 +64,8 @@ const Index = () => {
     }
   };
 
-  const handleSurpriseMe = () => {
-    const randomPrompt = surprisePrompts[Math.floor(Math.random() * surprisePrompts.length)];
-    setPrompt(randomPrompt);
+  const handleEnhancePrompt = (enhancedPrompt: string) => {
+    setPrompt(enhancedPrompt);
   };
 
   return (
@@ -86,7 +85,7 @@ const Index = () => {
               <Sparkles className="h-6 w-6 text-primary-foreground" />
             </div>
             <h1 className="text-3xl font-bold bg-gradient-ai bg-clip-text text-transparent">
-              AI Image Generator
+              Social Media Post Generator
             </h1>
           </div>
           <ModeToggle />
@@ -99,9 +98,9 @@ const Index = () => {
             <div className="absolute -inset-1 bg-gradient-ai rounded-3xl opacity-10 blur-2xl" />
             <div className="relative bg-card/60 backdrop-blur-xl rounded-3xl border border-border/50 p-8 space-y-6 shadow-2xl">
               <div className="space-y-2">
-                <h2 className="text-xl font-semibold">Create Your Vision</h2>
+                <h2 className="text-xl font-semibold">Create Your Post</h2>
                 <p className="text-sm text-muted-foreground">
-                  Describe what you want to see, and watch AI bring it to life.
+                  Describe your social media post and let AI create stunning visuals for your agency.
                 </p>
               </div>
 
@@ -119,7 +118,11 @@ const Index = () => {
                     disabled={isLoading}
                   />
                 </div>
-                <SurpriseMeButton onClick={handleSurpriseMe} disabled={isLoading} />
+                <SurpriseMeButton 
+                  currentPrompt={prompt}
+                  onEnhance={handleEnhancePrompt}
+                  disabled={isLoading}
+                />
               </div>
 
               <GenerateButton
@@ -149,9 +152,9 @@ const Index = () => {
               <div className="inline-flex p-4 bg-gradient-glow rounded-full mb-4">
                 <Sparkles className="h-12 w-12 text-primary" />
               </div>
-              <h3 className="text-2xl font-semibold">Ready to Create?</h3>
+              <h3 className="text-2xl font-semibold">Ready to Create Amazing Posts?</h3>
               <p className="text-muted-foreground max-w-md mx-auto">
-                Enter a prompt above and let AI transform your imagination into stunning visuals.
+                Enter your post description above and let AI create professional social media content for your agency.
               </p>
             </div>
           )}

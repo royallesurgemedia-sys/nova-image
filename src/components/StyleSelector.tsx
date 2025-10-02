@@ -9,15 +9,15 @@ interface StyleSelectorProps {
 
 const styles = [
   "Realistic",
-  "3D Render",
-  "Anime",
-  "Digital Art",
-  "Oil Painting",
-  "Watercolor",
-  "Cyberpunk",
-  "Fantasy",
-  "Minimalist",
-  "Abstract",
+  "Modern Minimal",
+  "Bold & Vibrant",
+  "Professional",
+  "Creative Artistic",
+  "Clean Corporate",
+  "Trendy Instagram",
+  "Elegant Luxury",
+  "Playful Fun",
+  "Geometric Abstract",
 ];
 
 export const StyleSelector = ({ value, onChange, disabled }: StyleSelectorProps) => {

@@ -28,7 +28,7 @@ export const GenerateButton = ({ onClick, isLoading, disabled, className }: Gene
       ) : (
         <>
           <Wand2 className="mr-2 h-5 w-5" />
-          Generate Image
+          Generate Post
         </>
       )}
     </Button>
