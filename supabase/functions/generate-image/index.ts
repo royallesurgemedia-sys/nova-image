@@ -12,57 +12,59 @@ serve(async (req) => {
 
   try {
     const { prompt, style } = await req.json();
-    const apiKey = Deno.env.get('CLIPDROP_API_KEY');
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
 
-    if (!apiKey) {
-      throw new Error('CLIPDROP_API_KEY not configured');
+    if (!LOVABLE_API_KEY) {
+      throw new Error('LOVABLE_API_KEY not configured');
     }
 
     if (!prompt) {
       throw new Error('Prompt is required');
     }
 
-    // Enhance prompt with style if provided
-    const enhancedPrompt = style && style !== 'Realistic' 
-      ? `${prompt}, ${style.toLowerCase()} style` 
-      : prompt;
+    // Enhance prompt for social media posts with style
+    const socialMediaPrompt = `Create a professional social media post image for a marketing agency. ${prompt}${style && style !== 'Realistic' ? `, ${style.toLowerCase()} style` : ''}. Make it eye-catching, modern, and optimized for Instagram/Facebook. Include clear text if mentioned in the prompt.`;
 
-    console.log('Generating image with prompt:', enhancedPrompt);
+    console.log('Generating social media post with prompt:', socialMediaPrompt);
 
-    const formData = new FormData();
-    formData.append('prompt', enhancedPrompt);
-
-    const response = await fetch('https://clipdrop-api.co/text-to-image/v1', {
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'x-api-key': apiKey,
+        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+        'Content-Type': 'application/json',
       },
-      body: formData,
+      body: JSON.stringify({
+        model: 'google/gemini-2.5-flash-image-preview',
+        messages: [
+          {
+            role: 'user',
+            content: socialMediaPrompt
+          }
+        ],
+        modalities: ['image', 'text']
+      }),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Clipdrop API error:', response.status, errorText);
-      throw new Error(`Clipdrop API error: ${response.status}`);
+      console.error('Lovable AI error:', response.status, errorText);
+      throw new Error(`Image generation failed: ${response.status}`);
     }
 
-    const imageBlob = await response.blob();
-    const arrayBuffer = await imageBlob.arrayBuffer();
-    const bytes = new Uint8Array(arrayBuffer);
-    
-    // Convert to base64 in chunks to avoid stack overflow
-    let binary = '';
-    const chunkSize = 8192;
-    for (let i = 0; i < bytes.length; i += chunkSize) {
-      const chunk = bytes.subarray(i, Math.min(i + chunkSize, bytes.length));
-      binary += String.fromCharCode(...chunk);
+    const data = await response.json();
+    const imageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+
+    if (!imageUrl) {
+      console.error('No image in response:', JSON.stringify(data));
+      throw new Error('No image generated');
     }
-    const base64Image = btoa(binary);
-    
+
+    console.log('Successfully generated social media post image');
+
     return new Response(
       JSON.stringify({ 
-        image: `data:image/png;base64,${base64Image}`,
-        prompt: enhancedPrompt,
+        image: imageUrl,
+        prompt: socialMediaPrompt,
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
