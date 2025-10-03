@@ -5,3 +5,6 @@ enabled = true
 
 [functions.generate-image]
 verify_jwt = false
+
+[functions.run-scheduled-posts]
+verify_jwt = false

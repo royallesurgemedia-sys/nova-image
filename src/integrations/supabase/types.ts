@@ -14,7 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      scheduled_posts: {
+        Row: {
+          created_at: string
+          cron_expression: string | null
+          id: string
+          is_active: boolean | null
+          last_run: string | null
+          prompt: string
+          schedule_time: string
+          style: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          cron_expression?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_run?: string | null
+          prompt: string
+          schedule_time: string
+          style?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          cron_expression?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_run?: string | null
+          prompt?: string
+          schedule_time?: string
+          style?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

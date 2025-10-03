@@ -5,9 +5,10 @@ import { GenerateButton } from "@/components/GenerateButton";
 import { ImageGrid } from "@/components/ImageGrid";
 import { ModeToggle } from "@/components/ModeToggle";
 import { SurpriseMeButton } from "@/components/SurpriseMeButton";
-import { useToast } from "@/hooks/use-toast";
+import { ScheduleManager } from "@/components/ScheduleManager";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { Sparkles } from "lucide-react";
 
 interface GeneratedImage {
   id: string;
@@ -20,15 +21,10 @@ const Index = () => {
   const [style, setStyle] = useState("Realistic");
   const [isLoading, setIsLoading] = useState(false);
   const [images, setImages] = useState<GeneratedImage[]>([]);
-  const { toast } = useToast();
 
   const generateImage = async () => {
     if (!prompt.trim()) {
-      toast({
-        title: "Prompt required",
-        description: "Please enter a description for your image.",
-        variant: "destructive",
-      });
+      toast.error("Please enter a description for your image");
       return;
     }
 
@@ -47,18 +43,11 @@ const Index = () => {
           prompt: data.prompt || prompt,
         };
         setImages(prev => [newImage, ...prev]);
-        toast({
-          title: "Image generated!",
-          description: "Your AI-generated image is ready.",
-        });
+        toast.success("Image generated! Your AI-powered social media post is ready.");
       }
     } catch (error) {
       console.error('Error generating image:', error);
-      toast({
-        title: "Generation failed",
-        description: error instanceof Error ? error.message : "Failed to generate image. Please try again.",
-        variant: "destructive",
-      });
+      toast.error(error instanceof Error ? error.message : "Failed to generate image. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -69,97 +58,126 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
-      {/* Animated background effects */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 -left-4 w-96 h-96 bg-primary/20 rounded-full mix-blend-multiply filter blur-3xl animate-glow-pulse" />
-        <div className="absolute top-0 -right-4 w-96 h-96 bg-secondary/20 rounded-full mix-blend-multiply filter blur-3xl animate-glow-pulse animation-delay-2000" />
-        <div className="absolute -bottom-8 left-20 w-96 h-96 bg-accent/20 rounded-full mix-blend-multiply filter blur-3xl animate-glow-pulse animation-delay-4000" />
-      </div>
-
-      <div className="relative container mx-auto px-4 py-8 max-w-7xl">
-        {/* Header */}
-        <header className="flex justify-between items-center mb-12">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-ai rounded-xl">
-              <Sparkles className="h-6 w-6 text-primary-foreground" />
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-blue-900/20">
+      {/* Header */}
+      <header className="border-b bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm sticky top-0 z-10">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                AI Social Post Generator
+              </h1>
+              <p className="text-sm text-muted-foreground mt-1">
+                Create stunning social media posts with AI
+              </p>
             </div>
-            <h1 className="text-3xl font-bold bg-gradient-ai bg-clip-text text-transparent">
-              Social Media Post Generator
-            </h1>
+            <ModeToggle />
           </div>
-          <ModeToggle />
-        </header>
+        </div>
+      </header>
 
-        {/* Main content */}
-        <div className="space-y-8">
-          {/* Input section */}
-          <div className="relative">
-            <div className="absolute -inset-1 bg-gradient-ai rounded-3xl opacity-10 blur-2xl" />
-            <div className="relative bg-card/60 backdrop-blur-xl rounded-3xl border border-border/50 p-8 space-y-6 shadow-2xl">
-              <div className="space-y-2">
-                <h2 className="text-xl font-semibold">Create Your Post</h2>
-                <p className="text-sm text-muted-foreground">
-                  Describe your social media post and let AI create stunning visuals for your agency.
-                </p>
-              </div>
+      <main className="container mx-auto px-4 py-8">
+        <Tabs defaultValue="generate" className="space-y-8">
+          <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
+            <TabsTrigger value="generate">Generate</TabsTrigger>
+            <TabsTrigger value="schedule">Schedule</TabsTrigger>
+          </TabsList>
 
-              <PromptInput
-                value={prompt}
-                onChange={setPrompt}
-                disabled={isLoading}
-              />
-
-              <div className="flex flex-col sm:flex-row gap-4">
-                <div className="flex-1">
-                  <StyleSelector
+          <TabsContent value="generate" className="space-y-8">
+            {/* Input Section */}
+            <div className="max-w-4xl mx-auto space-y-6">
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 space-y-6">
+                <PromptInput 
+                  value={prompt} 
+                  onChange={setPrompt}
+                  disabled={isLoading}
+                />
+                
+                <div className="space-y-3">
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Style
+                  </label>
+                  <StyleSelector 
                     value={style}
                     onChange={setStyle}
                     disabled={isLoading}
                   />
                 </div>
-                <SurpriseMeButton 
-                  currentPrompt={prompt}
-                  onEnhance={handleEnhancePrompt}
-                  disabled={isLoading}
-                />
-              </div>
 
-              <GenerateButton
-                onClick={generateImage}
-                isLoading={isLoading}
-                disabled={!prompt.trim()}
-                className="w-full sm:w-auto"
-              />
-            </div>
-          </div>
-
-          {/* Results section */}
-          {images.length > 0 && (
-            <div className="space-y-6">
-              <div className="flex items-center gap-2">
-                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent" />
-                <h2 className="text-xl font-semibold">Your Creations</h2>
-                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent" />
+                <div className="flex gap-3">
+                  <GenerateButton 
+                    onClick={generateImage} 
+                    isLoading={isLoading}
+                    className="flex-1"
+                  />
+                  <SurpriseMeButton 
+                    currentPrompt={prompt}
+                    onEnhance={handleEnhancePrompt}
+                    disabled={isLoading}
+                  />
+                </div>
               </div>
-              <ImageGrid images={images} />
             </div>
-          )}
 
-          {/* Empty state */}
-          {images.length === 0 && !isLoading && (
-            <div className="text-center py-20 space-y-4">
-              <div className="inline-flex p-4 bg-gradient-glow rounded-full mb-4">
-                <Sparkles className="h-12 w-12 text-primary" />
+            {/* Results Section */}
+            {isLoading && (
+              <div className="max-w-4xl mx-auto">
+                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-12">
+                  <div className="flex flex-col items-center justify-center space-y-4">
+                    <div className="relative">
+                      <div className="w-16 h-16 border-4 border-purple-200 dark:border-purple-900 rounded-full"></div>
+                      <div className="w-16 h-16 border-4 border-purple-600 dark:border-purple-400 rounded-full animate-spin border-t-transparent absolute top-0 left-0"></div>
+                    </div>
+                    <p className="text-lg font-medium text-gray-700 dark:text-gray-300">
+                      Creating your masterpiece...
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      This may take a few moments
+                    </p>
+                  </div>
+                </div>
               </div>
-              <h3 className="text-2xl font-semibold">Ready to Create Amazing Posts?</h3>
-              <p className="text-muted-foreground max-w-md mx-auto">
-                Enter your post description above and let AI create professional social media content for your agency.
-              </p>
+            )}
+
+            {!isLoading && images.length > 0 && (
+              <div className="max-w-6xl mx-auto space-y-6">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                    Generated Images ({images.length})
+                  </h2>
+                </div>
+                <ImageGrid images={images} />
+              </div>
+            )}
+
+            {!isLoading && images.length === 0 && (
+              <div className="max-w-4xl mx-auto">
+                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-12">
+                  <div className="text-center space-y-4">
+                    <div className="w-20 h-20 mx-auto bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/20 dark:to-pink-900/20 rounded-full flex items-center justify-center">
+                      <svg className="w-10 h-10 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                      No images yet
+                    </h3>
+                    <p className="text-muted-foreground max-w-md mx-auto">
+                      Enter a prompt above and click "Generate Image" to create your first AI-powered social media post
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="schedule">
+            <div className="max-w-4xl mx-auto">
+              <ScheduleManager />
             </div>
-          )}
-        </div>
-      </div>
+          </TabsContent>
+        </Tabs>
+      </main>
     </div>
   );
 };
