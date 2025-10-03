@@ -6,9 +6,9 @@ import { ImageGrid } from "@/components/ImageGrid";
 import { ModeToggle } from "@/components/ModeToggle";
 import { SurpriseMeButton } from "@/components/SurpriseMeButton";
 import { ScheduleManager } from "@/components/ScheduleManager";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface GeneratedImage {
   id: string;
