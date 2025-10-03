@@ -12,10 +12,10 @@ serve(async (req) => {
 
   try {
     const { prompt, style } = await req.json();
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    const HF_TOKEN = Deno.env.get('HUGGING_FACE_ACCESS_TOKEN');
 
-    if (!LOVABLE_API_KEY) {
-      throw new Error('LOVABLE_API_KEY not configured');
+    if (!HF_TOKEN) {
+      throw new Error('HUGGING_FACE_ACCESS_TOKEN not configured');
     }
 
     if (!prompt) {
@@ -25,45 +25,43 @@ serve(async (req) => {
     // Enhance prompt for social media posts with style
     const socialMediaPrompt = `Create a professional social media post image for a marketing agency. ${prompt}${style && style !== 'Realistic' ? `, ${style.toLowerCase()} style` : ''}. Make it eye-catching, modern, and optimized for Instagram/Facebook. Include clear text if mentioned in the prompt.`;
 
-    console.log('Generating social media post with prompt:', socialMediaPrompt);
+    console.log('Generating social media post with Hugging Face:', socialMediaPrompt);
 
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    const response = await fetch('https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+        'Authorization': `Bearer ${HF_TOKEN}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash-image-preview',
-        messages: [
-          {
-            role: 'user',
-            content: socialMediaPrompt
-          }
-        ],
-        modalities: ['image', 'text']
+        inputs: socialMediaPrompt,
       }),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Lovable AI error:', response.status, errorText);
+      console.error('Hugging Face API error:', response.status, errorText);
       throw new Error(`Image generation failed: ${response.status}`);
     }
 
-    const data = await response.json();
-    const imageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-
-    if (!imageUrl) {
-      console.error('No image in response:', JSON.stringify(data));
-      throw new Error('No image generated');
+    // Convert blob to base64
+    const imageBlob = await response.blob();
+    const arrayBuffer = await imageBlob.arrayBuffer();
+    const bytes = new Uint8Array(arrayBuffer);
+    
+    let binary = '';
+    const chunkSize = 8192;
+    for (let i = 0; i < bytes.length; i += chunkSize) {
+      const chunk = bytes.subarray(i, Math.min(i + chunkSize, bytes.length));
+      binary += String.fromCharCode(...chunk);
     }
+    const base64Image = btoa(binary);
 
-    console.log('Successfully generated social media post image');
+    console.log('Successfully generated social media post image with Hugging Face');
 
     return new Response(
       JSON.stringify({ 
-        image: imageUrl,
+        image: `data:image/png;base64,${base64Image}`,
         prompt: socialMediaPrompt,
       }),
       { 
