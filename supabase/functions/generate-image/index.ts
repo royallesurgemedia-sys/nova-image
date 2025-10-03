@@ -22,8 +22,8 @@ serve(async (req) => {
       throw new Error('Prompt is required');
     }
 
-    // Enhance prompt for social media posts with style
-    const socialMediaPrompt = `Create a professional social media post image for a marketing agency. ${prompt}${style && style !== 'Realistic' ? `, ${style.toLowerCase()} style` : ''}. Make it eye-catching, modern, and optimized for Instagram/Facebook. Include clear text if mentioned in the prompt.`;
+    // Enhance prompt for social media posts with style (English only)
+    const socialMediaPrompt = `Create a professional social media post image for a marketing agency. ${prompt}${style && style !== 'Realistic' ? `, ${style.toLowerCase()} style` : ''}. Make it eye-catching, modern, and optimized for Instagram/Facebook. All text must be in English only. Include clear, readable English text if mentioned in the prompt.`;
 
     console.log('Generating social media post with Hugging Face:', socialMediaPrompt);
 
