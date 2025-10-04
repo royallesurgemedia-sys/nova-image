@@ -3,10 +3,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
-import { Calendar, Clock, Play } from "lucide-react";
+import { Calendar, Clock, Play, Facebook, Linkedin, Twitter, Youtube, Instagram } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { StyleSelector } from "./StyleSelector";
+
+const SOCIAL_MEDIA_ACCOUNTS = {
+  twitter: "https://x.com/Royalsurgmedia?t=nC39gcOy_Fbg5tdy-BvaRg&s=09",
+  instagram: "https://www.instagram.com/royalle_surge.media?igsh=MWV3NHB5cmtiaGYwcQ==",
+  facebook: "https://www.facebook.com/share/1HF6XLPnsX/",
+  youtube: "https://youtube.com/@royallesurgemedia?si=PLJyrThd1z75hdU_",
+  linkedin: "https://www.linkedin.com/company/royalle-surge-media/",
+};
 
 export const ScheduleManager = () => {
   const [prompt, setPrompt] = useState("");
@@ -62,7 +70,10 @@ export const ScheduleManager = () => {
   return (
     <Card className="p-6 space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-semibold">Schedule Posts</h2>
+        <div>
+          <h2 className="text-2xl font-semibold">Schedule Posts - Royal Surge Media</h2>
+          <p className="text-sm text-muted-foreground mt-1">Manage your social media content</p>
+        </div>
         <Button
           onClick={handleRunNow}
           disabled={isLoading}
@@ -113,6 +124,60 @@ export const ScheduleManager = () => {
           <Clock className="w-4 h-4 mr-2" />
           Schedule Post
         </Button>
+      </div>
+
+      <div className="border-t pt-6">
+        <h3 className="text-lg font-semibold mb-4">Royal Surge Media Social Accounts</h3>
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-2"
+            onClick={() => window.open(SOCIAL_MEDIA_ACCOUNTS.twitter, '_blank')}
+          >
+            <Twitter className="w-4 h-4" />
+            Twitter
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-2"
+            onClick={() => window.open(SOCIAL_MEDIA_ACCOUNTS.instagram, '_blank')}
+          >
+            <Instagram className="w-4 h-4" />
+            Instagram
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-2"
+            onClick={() => window.open(SOCIAL_MEDIA_ACCOUNTS.facebook, '_blank')}
+          >
+            <Facebook className="w-4 h-4" />
+            Facebook
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-2"
+            onClick={() => window.open(SOCIAL_MEDIA_ACCOUNTS.youtube, '_blank')}
+          >
+            <Youtube className="w-4 h-4" />
+            YouTube
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-2"
+            onClick={() => window.open(SOCIAL_MEDIA_ACCOUNTS.linkedin, '_blank')}
+          >
+            <Linkedin className="w-4 h-4" />
+            LinkedIn
+          </Button>
+        </div>
+        <p className="text-xs text-muted-foreground mt-3">
+          After generating your post, click on these buttons to open your social media accounts and manually post the content.
+        </p>
       </div>
     </Card>
   );
