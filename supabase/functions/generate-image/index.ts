@@ -12,10 +12,10 @@ serve(async (req) => {
 
   try {
     const { prompt, style } = await req.json();
-    const GOOGLE_AI_API_KEY = Deno.env.get('GOOGLE_AI_API_KEY');
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
 
-    if (!GOOGLE_AI_API_KEY) {
-      throw new Error('GOOGLE_AI_API_KEY not configured');
+    if (!LOVABLE_API_KEY) {
+      throw new Error('LOVABLE_API_KEY not configured');
     }
 
     if (!prompt) {
@@ -36,40 +36,40 @@ Requirements:
 - If complex text is required, ensure accuracy or leave clean space for manual text addition
 - Output must look like a finished ad, ready for client use`;
 
-    console.log('Generating social media post with Google Gemini AI:', socialMediaPrompt);
+    console.log('Generating social media post with Lovable AI:', socialMediaPrompt);
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GOOGLE_AI_API_KEY}`, {
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
+        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        contents: [{
-          parts: [{
-            text: socialMediaPrompt
-          }]
-        }],
-        generationConfig: {
-          responseMimeType: "image/jpeg"
-        }
+        model: 'google/gemini-2.5-flash-image-preview',
+        messages: [
+          {
+            role: 'user',
+            content: socialMediaPrompt
+          }
+        ],
+        modalities: ['image', 'text']
       }),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Google Gemini API error:', response.status, errorText);
+      console.error('Lovable AI API error:', response.status, errorText);
       throw new Error(`Image generation failed: ${response.status}`);
     }
 
     const data = await response.json();
-    const imageData = data.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+    const generatedImageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
 
-    if (!imageData) {
+    if (!generatedImageUrl) {
       throw new Error('No image returned from AI');
     }
 
-    const generatedImageUrl = `data:image/jpeg;base64,${imageData}`;
-    console.log('Successfully generated social media post image with Google Gemini AI');
+    console.log('Successfully generated social media post image with Lovable AI');
 
     return new Response(
       JSON.stringify({ 
