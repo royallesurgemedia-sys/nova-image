@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,6 +10,12 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { StyleSelector } from "./StyleSelector";
 
+interface ScheduleManagerProps {
+  prefilledImage?: string;
+  prefilledPrompt?: string;
+  onClearPrefilled?: () => void;
+}
+
 const SOCIAL_MEDIA_ACCOUNTS = {
   twitter: "https://x.com/Royalsurgmedia?t=nC39gcOy_Fbg5tdy-BvaRg&s=09",
   instagram: "https://www.instagram.com/royalle_surge.media?igsh=MWV3NHB5cmtiaGYwcQ==",
@@ -18,7 +24,7 @@ const SOCIAL_MEDIA_ACCOUNTS = {
   linkedin: "https://www.linkedin.com/company/royalle-surge-media/",
 };
 
-export const ScheduleManager = () => {
+export const ScheduleManager = ({ prefilledImage, prefilledPrompt, onClearPrefilled }: ScheduleManagerProps) => {
   const [prompt, setPrompt] = useState("");
   const [style, setStyle] = useState("Realistic");
   const [scheduleTime, setScheduleTime] = useState("");
@@ -37,6 +43,32 @@ export const ScheduleManager = () => {
     twitter: true,
     linkedin: true,
   });
+
+  useEffect(() => {
+    if (prefilledImage && prefilledPrompt) {
+      setGeneratedImage(prefilledImage);
+      setPrompt(prefilledPrompt);
+      // Auto-generate captions when image is prefilled
+      handleGenerateCaptions(prefilledPrompt, style);
+      onClearPrefilled?.();
+    }
+  }, [prefilledImage, prefilledPrompt]);
+
+  const handleGenerateCaptions = async (captionPrompt: string, captionStyle: string) => {
+    try {
+      const { data: captionData, error: captionError } = await supabase.functions.invoke('generate-captions', {
+        body: { prompt: captionPrompt, style: captionStyle }
+      });
+
+      if (captionError) throw captionError;
+
+      setCaptions(captionData.captions);
+      toast.success("Captions generated for all platforms!");
+    } catch (error) {
+      console.error('Error generating captions:', error);
+      toast.error("Failed to generate captions");
+    }
+  };
 
   const handleGenerate = async () => {
     if (!prompt) {

@@ -21,6 +21,9 @@ const Index = () => {
   const [style, setStyle] = useState("Realistic");
   const [isLoading, setIsLoading] = useState(false);
   const [images, setImages] = useState<GeneratedImage[]>([]);
+  const [activeTab, setActiveTab] = useState("generate");
+  const [scheduledImage, setScheduledImage] = useState<string>("");
+  const [scheduledPrompt, setScheduledPrompt] = useState<string>("");
 
   const generateImage = async () => {
     if (!prompt.trim()) {
@@ -57,6 +60,13 @@ const Index = () => {
     setPrompt(enhancedPrompt);
   };
 
+  const handleSendToSchedule = (image: string, imagePrompt: string) => {
+    setScheduledImage(image);
+    setScheduledPrompt(imagePrompt);
+    setActiveTab("schedule");
+    toast.success("Image sent to scheduler!");
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-blue-900/20">
       {/* Header */}
@@ -77,7 +87,7 @@ const Index = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        <Tabs defaultValue="generate" className="space-y-8">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
           <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
             <TabsTrigger value="generate">Generate</TabsTrigger>
             <TabsTrigger value="schedule">Schedule</TabsTrigger>
@@ -146,7 +156,7 @@ const Index = () => {
                     Generated Images ({images.length})
                   </h2>
                 </div>
-                <ImageGrid images={images} />
+                <ImageGrid images={images} onSendToSchedule={handleSendToSchedule} />
               </div>
             )}
 
@@ -173,7 +183,14 @@ const Index = () => {
 
           <TabsContent value="schedule">
             <div className="max-w-4xl mx-auto">
-              <ScheduleManager />
+              <ScheduleManager 
+                prefilledImage={scheduledImage}
+                prefilledPrompt={scheduledPrompt}
+                onClearPrefilled={() => {
+                  setScheduledImage("");
+                  setScheduledPrompt("");
+                }}
+              />
             </div>
           </TabsContent>
         </Tabs>

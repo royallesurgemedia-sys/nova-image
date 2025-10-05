@@ -8,9 +8,10 @@ interface GeneratedImage {
 
 interface ImageGridProps {
   images: GeneratedImage[];
+  onSendToSchedule?: (image: string, prompt: string) => void;
 }
 
-export const ImageGrid = ({ images }: ImageGridProps) => {
+export const ImageGrid = ({ images, onSendToSchedule }: ImageGridProps) => {
   if (images.length === 0) {
     return null;
   }
@@ -18,7 +19,12 @@ export const ImageGrid = ({ images }: ImageGridProps) => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {images.map((image) => (
-        <ImageCard key={image.id} src={image.src} prompt={image.prompt} />
+        <ImageCard 
+          key={image.id} 
+          src={image.src} 
+          prompt={image.prompt}
+          onSendToSchedule={onSendToSchedule}
+        />
       ))}
     </div>
   );

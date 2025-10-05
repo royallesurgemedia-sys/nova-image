@@ -1,4 +1,4 @@
-import { Download } from "lucide-react";
+import { Download, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -6,9 +6,10 @@ interface ImageCardProps {
   src: string;
   prompt: string;
   className?: string;
+  onSendToSchedule?: (image: string, prompt: string) => void;
 }
 
-export const ImageCard = ({ src, prompt, className }: ImageCardProps) => {
+export const ImageCard = ({ src, prompt, className, onSendToSchedule }: ImageCardProps) => {
   const handleDownload = () => {
     const link = document.createElement('a');
     link.href = src;
@@ -16,6 +17,10 @@ export const ImageCard = ({ src, prompt, className }: ImageCardProps) => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  const handleSendToSchedule = () => {
+    onSendToSchedule?.(src, prompt);
   };
 
   return (
@@ -32,15 +37,26 @@ export const ImageCard = ({ src, prompt, className }: ImageCardProps) => {
         </div>
         <div className="p-4 space-y-3">
           <p className="text-sm text-muted-foreground line-clamp-2">{prompt}</p>
-          <Button
-            onClick={handleDownload}
-            variant="outline"
-            size="sm"
-            className="w-full bg-background/50 backdrop-blur-sm hover:bg-primary hover:text-primary-foreground transition-all duration-300"
-          >
-            <Download className="mr-2 h-4 w-4" />
-            Download
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              onClick={handleDownload}
+              variant="outline"
+              size="sm"
+              className="flex-1 bg-background/50 backdrop-blur-sm hover:bg-primary hover:text-primary-foreground transition-all duration-300"
+            >
+              <Download className="mr-2 h-4 w-4" />
+              Download
+            </Button>
+            <Button
+              onClick={handleSendToSchedule}
+              variant="default"
+              size="sm"
+              className="flex-1"
+            >
+              <Calendar className="mr-2 h-4 w-4" />
+              Schedule
+            </Button>
+          </div>
         </div>
       </div>
     </div>
