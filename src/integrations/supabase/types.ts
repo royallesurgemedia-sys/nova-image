@@ -16,35 +16,53 @@ export type Database = {
     Tables: {
       scheduled_posts: {
         Row: {
+          caption_facebook: string | null
+          caption_instagram: string | null
+          caption_linkedin: string | null
+          caption_twitter: string | null
           created_at: string
           cron_expression: string | null
+          generated_image_url: string | null
           id: string
           is_active: boolean | null
           last_run: string | null
           prompt: string
           schedule_time: string
+          selected_platforms: string[] | null
           style: string | null
           updated_at: string
         }
         Insert: {
+          caption_facebook?: string | null
+          caption_instagram?: string | null
+          caption_linkedin?: string | null
+          caption_twitter?: string | null
           created_at?: string
           cron_expression?: string | null
+          generated_image_url?: string | null
           id?: string
           is_active?: boolean | null
           last_run?: string | null
           prompt: string
           schedule_time: string
+          selected_platforms?: string[] | null
           style?: string | null
           updated_at?: string
         }
         Update: {
+          caption_facebook?: string | null
+          caption_instagram?: string | null
+          caption_linkedin?: string | null
+          caption_twitter?: string | null
           created_at?: string
           cron_expression?: string | null
+          generated_image_url?: string | null
           id?: string
           is_active?: boolean | null
           last_run?: string | null
           prompt?: string
           schedule_time?: string
+          selected_platforms?: string[] | null
           style?: string | null
           updated_at?: string
         }

@@ -3,7 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
-import { Calendar, Clock, Play, Facebook, Linkedin, Twitter, Youtube, Instagram } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Calendar, Clock, Play, Facebook, Linkedin, Twitter, Youtube, Instagram, Loader2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { StyleSelector } from "./StyleSelector";
@@ -21,10 +23,68 @@ export const ScheduleManager = () => {
   const [style, setStyle] = useState("Realistic");
   const [scheduleTime, setScheduleTime] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedImage, setGeneratedImage] = useState("");
+  const [captions, setCaptions] = useState({
+    instagram: "",
+    facebook: "",
+    twitter: "",
+    linkedin: "",
+  });
+  const [selectedPlatforms, setSelectedPlatforms] = useState({
+    instagram: true,
+    facebook: true,
+    twitter: true,
+    linkedin: true,
+  });
+
+  const handleGenerate = async () => {
+    if (!prompt) {
+      toast.error("Please enter a prompt");
+      return;
+    }
+
+    setIsGenerating(true);
+    try {
+      // Generate image
+      const { data: imageData, error: imageError } = await supabase.functions.invoke('generate-image', {
+        body: { prompt, style }
+      });
+
+      if (imageError) throw imageError;
+      
+      setGeneratedImage(imageData.image);
+      toast.success("Image generated!");
+
+      // Generate captions
+      const { data: captionData, error: captionError } = await supabase.functions.invoke('generate-captions', {
+        body: { prompt, style }
+      });
+
+      if (captionError) throw captionError;
+
+      setCaptions(captionData.captions);
+      toast.success("Captions generated for all platforms!");
+    } catch (error) {
+      console.error('Error generating content:', error);
+      toast.error("Failed to generate content");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   const handleSchedule = async () => {
-    if (!prompt || !scheduleTime) {
-      toast.error("Please fill in all fields");
+    if (!prompt || !scheduleTime || !generatedImage) {
+      toast.error("Please generate content and set schedule time");
+      return;
+    }
+
+    const platforms = Object.entries(selectedPlatforms)
+      .filter(([_, selected]) => selected)
+      .map(([platform]) => platform);
+
+    if (platforms.length === 0) {
+      toast.error("Please select at least one platform");
       return;
     }
 
@@ -36,6 +96,12 @@ export const ScheduleManager = () => {
           prompt,
           style,
           schedule_time: new Date(scheduleTime).toISOString(),
+          generated_image_url: generatedImage,
+          caption_instagram: captions.instagram,
+          caption_facebook: captions.facebook,
+          caption_twitter: captions.twitter,
+          caption_linkedin: captions.linkedin,
+          selected_platforms: platforms,
         });
 
       if (error) throw error;
@@ -43,6 +109,13 @@ export const ScheduleManager = () => {
       toast.success("Post scheduled successfully!");
       setPrompt("");
       setScheduleTime("");
+      setGeneratedImage("");
+      setCaptions({
+        instagram: "",
+        facebook: "",
+        twitter: "",
+        linkedin: "",
+      });
     } catch (error) {
       console.error('Error scheduling post:', error);
       toast.error("Failed to schedule post");
@@ -72,7 +145,7 @@ export const ScheduleManager = () => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-semibold">Schedule Posts - Royal Surge Media</h2>
-          <p className="text-sm text-muted-foreground mt-1">Manage your social media content</p>
+          <p className="text-sm text-muted-foreground mt-1">Generate content, set captions, then schedule</p>
         </div>
         <Button
           onClick={handleRunNow}
@@ -102,28 +175,98 @@ export const ScheduleManager = () => {
           <StyleSelector value={style} onChange={setStyle} />
         </div>
 
-        <div>
-          <Label htmlFor="schedule-time" className="flex items-center gap-2">
-            <Calendar className="w-4 h-4" />
-            Schedule Time
-          </Label>
-          <Input
-            id="schedule-time"
-            type="datetime-local"
-            value={scheduleTime}
-            onChange={(e) => setScheduleTime(e.target.value)}
-            className="mt-1"
-          />
-        </div>
-
         <Button
-          onClick={handleSchedule}
-          disabled={isLoading}
+          onClick={handleGenerate}
+          disabled={isGenerating || !prompt}
           className="w-full"
+          variant="outline"
         >
-          <Clock className="w-4 h-4 mr-2" />
-          Schedule Post
+          {isGenerating ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              Generating...
+            </>
+          ) : (
+            <>
+              <Sparkles className="w-4 h-4 mr-2" />
+              Generate Image & Captions
+            </>
+          )}
         </Button>
+
+        {generatedImage && (
+          <div className="space-y-4">
+            <div>
+              <Label>Generated Image</Label>
+              <img 
+                src={generatedImage} 
+                alt="Generated" 
+                className="w-full rounded-lg mt-2 border"
+              />
+            </div>
+
+            <div>
+              <Label className="mb-2 block">Select Platforms</Label>
+              <div className="grid grid-cols-2 gap-3">
+                {Object.entries(selectedPlatforms).map(([platform, selected]) => (
+                  <div key={platform} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={platform}
+                      checked={selected}
+                      onCheckedChange={(checked) =>
+                        setSelectedPlatforms((prev) => ({ ...prev, [platform]: checked as boolean }))
+                      }
+                    />
+                    <Label htmlFor={platform} className="capitalize cursor-pointer">
+                      {platform}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {Object.entries(captions).map(([platform, caption]) => (
+              selectedPlatforms[platform as keyof typeof selectedPlatforms] && caption && (
+                <div key={platform}>
+                  <Label htmlFor={`caption-${platform}`} className="capitalize">
+                    {platform} Caption
+                  </Label>
+                  <Textarea
+                    id={`caption-${platform}`}
+                    value={caption}
+                    onChange={(e) =>
+                      setCaptions((prev) => ({ ...prev, [platform]: e.target.value }))
+                    }
+                    className="mt-1 min-h-[100px]"
+                  />
+                </div>
+              )
+            ))}
+
+            <div>
+              <Label htmlFor="schedule-time" className="flex items-center gap-2">
+                <Calendar className="w-4 h-4" />
+                Schedule Time
+              </Label>
+              <Input
+                id="schedule-time"
+                type="datetime-local"
+                value={scheduleTime}
+                onChange={(e) => setScheduleTime(e.target.value)}
+                className="mt-1"
+              />
+            </div>
+
+            <Button
+              onClick={handleSchedule}
+              disabled={isLoading || !scheduleTime}
+              className="w-full"
+            >
+              <Clock className="w-4 h-4 mr-2" />
+              Schedule Post
+            </Button>
+          </div>
+        )}
       </div>
 
       <div className="border-t pt-6">
