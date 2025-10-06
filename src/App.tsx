@@ -3,10 +3,41 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/AppSidebar";
+import { ModeToggle } from "@/components/ModeToggle";
+import ImageGeneration from "./pages/ImageGeneration";
+import VideoGeneration from "./pages/VideoGeneration";
+import Schedule from "./pages/Schedule";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
+
+const Layout = ({ children }: { children: React.ReactNode }) => (
+  <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-blue-900/20">
+    <header className="border-b bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm sticky top-0 z-10">
+      <div className="container mx-auto px-4 py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <SidebarTrigger />
+            <div>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                AI Social Post Generator
+              </h1>
+              <p className="text-sm text-muted-foreground mt-1">
+                Create stunning social media posts with AI
+              </p>
+            </div>
+          </div>
+          <ModeToggle />
+        </div>
+      </div>
+    </header>
+    <main className="container mx-auto px-4 py-8">
+      {children}
+    </main>
+  </div>
+);
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -14,11 +45,20 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <SidebarProvider>
+          <div className="flex min-h-screen w-full">
+            <AppSidebar />
+            <div className="flex-1">
+              <Routes>
+                <Route path="/" element={<Layout><ImageGeneration /></Layout>} />
+                <Route path="/video" element={<Layout><VideoGeneration /></Layout>} />
+                <Route path="/schedule" element={<Layout><Schedule /></Layout>} />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </div>
+          </div>
+        </SidebarProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
