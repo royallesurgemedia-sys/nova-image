@@ -13,78 +13,91 @@ serve(async (req) => {
 
   try {
     const { prompt, videoType } = await req.json();
-    const GOOGLE_AI_API_KEY = Deno.env.get('GOOGLE_AI_API_KEY');
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
 
-    if (!GOOGLE_AI_API_KEY) {
-      throw new Error('GOOGLE_AI_API_KEY not configured');
+    if (!LOVABLE_API_KEY) {
+      throw new Error('LOVABLE_API_KEY not configured');
     }
 
     if (!prompt) {
       throw new Error('Prompt is required');
     }
 
-    const duration = videoType === 'reel' ? '15-60 seconds' : '1-10 minutes';
+    const duration = videoType === 'reel' ? '15-60 seconds vertical format' : '1-10 minutes horizontal format';
     
-    // Enhanced prompt for video generation
-    const videoPrompt = `Create a professional social media video for: ${prompt}
+    // Generate a storyboard of key frames for the video using AI
+    const storyboardPrompt = `Create a detailed storyboard for a professional social media video about: ${prompt}
     
-Duration: ${duration}
-Requirements:
-- High quality, engaging visuals
-- Smooth transitions
-- Professional editing
-- Optimized for ${videoType === 'reel' ? 'Instagram Reels, TikTok' : 'YouTube, Facebook'}
-- Include dynamic camera movements
-- Add appropriate background music/sound effects
-- Modern, eye-catching style`;
+Format: ${duration}
+Platform: ${videoType === 'reel' ? 'Instagram Reels, TikTok (9:16 aspect ratio)' : 'YouTube, Facebook (16:9 aspect ratio)'}
 
-    console.log('Generating video with Google AI:', videoPrompt);
+Provide a JSON response with this structure:
+{
+  "title": "Video title",
+  "description": "Brief description",
+  "keyFrames": [
+    {
+      "timestamp": "0:00-0:03",
+      "scene": "Opening scene description with visual details",
+      "text": "Any text overlay"
+    }
+  ],
+  "transitions": ["transition style between scenes"],
+  "music": "suggested background music mood"
+}`;
 
-    // Note: Google's Gemini API doesn't directly support video generation yet
-    // This is a placeholder that simulates the API call structure
-    // When Google releases video generation capabilities, update this endpoint
-    
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash-exp:generateContent?key=${GOOGLE_AI_API_KEY}`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{
-              text: `${videoPrompt}\n\nNote: Please describe how this video would be created, including scenes, transitions, and visual elements. Return a JSON with structure: {"description": "...", "scenes": [...], "duration": "..."}`
-            }]
-          }],
-          generationConfig: {
-            temperature: 0.9,
-            topK: 40,
-            topP: 0.95,
-            maxOutputTokens: 2048,
+    console.log('Generating video storyboard with Lovable AI');
+
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'google/gemini-2.5-flash',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a professional video director and storyboard artist. Create detailed, visually compelling video concepts.'
+          },
+          {
+            role: 'user',
+            content: storyboardPrompt
           }
-        }),
-      }
-    );
+        ],
+        temperature: 0.8,
+      }),
+    });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Google AI API error:', response.status, errorText);
-      throw new Error(`Video generation failed: ${response.status}`);
+      console.error('Lovable AI API error:', response.status, errorText);
+      throw new Error(`Video storyboard generation failed: ${response.status}`);
     }
 
     const data = await response.json();
-    console.log('Google AI Response:', JSON.stringify(data));
+    const storyboardText = data.choices?.[0]?.message?.content;
 
-    // For now, return a placeholder since actual video generation isn't available yet
-    // When the API supports it, this will return the actual video URL
-    const videoDescription = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Video concept created';
+    if (!storyboardText) {
+      throw new Error('No storyboard generated');
+    }
 
+    console.log('Successfully generated video storyboard');
+
+    // Note: True video generation requires specialized APIs like Runway, Pika, or similar
+    // For now, we return the storyboard and a sample video
+    // In production, you would integrate with a proper video generation API
+    
     return new Response(
       JSON.stringify({ 
-        videoUrl: 'https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4', // Placeholder
-        description: videoDescription,
-        message: 'Note: This is a placeholder. Google Gemini video generation will be integrated when available.'
+        videoUrl: videoType === 'reel' 
+          ? 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4'
+          : 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+        storyboard: storyboardText,
+        prompt: prompt,
+        videoType: videoType,
+        note: 'This is a sample video. Video storyboard has been generated. For actual video generation, integration with services like Runway ML, Pika, or similar would be needed.'
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
