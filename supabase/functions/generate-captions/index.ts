@@ -24,21 +24,41 @@ serve(async (req) => {
 
     console.log('Generating platform-specific captions for:', prompt);
 
-    const captionPrompt = `Generate engaging social media captions for the following post: "${prompt}" ${style && style !== 'Realistic' ? `in ${style} style` : ''}.
+    const captionPrompt = `Create highly engaging, conversion-optimized social media captions for: "${prompt}" ${style && style !== 'Realistic' ? `in ${style} style` : ''}.
 
-Create 4 different captions optimized for each platform:
+Generate 4 platform-specific captions with strategic hashtags:
 
-1. Instagram: Engaging, emoji-rich, with relevant hashtags (max 2200 chars). Use 5-10 strategic hashtags.
-2. Facebook: Conversational and community-focused, slightly longer form (max 500 chars). 1-3 hashtags.
-3. Twitter/X: Concise, punchy, with 1-2 hashtags (max 280 chars including hashtags).
-4. LinkedIn: Professional, value-focused, industry-relevant (max 700 chars). 2-4 professional hashtags.
+1. INSTAGRAM (2200 chars max):
+   - Hook with emojis in first line
+   - Engaging storytelling body
+   - Strong call-to-action
+   - 8-15 relevant hashtags (mix of popular & niche)
+   - Include hashtags like #SocialMediaMarketing #DigitalMarketing #ContentCreator #MarketingStrategy
 
-Return ONLY a JSON object with this exact structure (no markdown, no code blocks):
+2. FACEBOOK (500 chars max):
+   - Conversational and community-focused
+   - Question or engagement hook
+   - 2-3 hashtags
+   - Encourage comments/shares
+
+3. TWITTER/X (280 chars max):
+   - Ultra-concise and punchy
+   - Thread-worthy hook
+   - 2-3 hashtags max
+   - Include trending relevant hashtags
+
+4. LINKEDIN (700 chars max):
+   - Professional value proposition
+   - Industry insights or lessons
+   - 3-5 professional hashtags
+   - Network-building tone
+
+CRITICAL: Return ONLY valid JSON (no markdown, no code blocks, no extra text):
 {
-  "instagram": "caption with emojis and hashtags",
-  "facebook": "caption with minimal hashtags",
-  "twitter": "short punchy caption with hashtags",
-  "linkedin": "professional caption with industry hashtags"
+  "instagram": "caption with emojis and 8-15 hashtags",
+  "facebook": "caption with 2-3 hashtags",
+  "twitter": "short punchy caption with 2-3 hashtags",
+  "linkedin": "professional caption with 3-5 hashtags"
 }`;
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {

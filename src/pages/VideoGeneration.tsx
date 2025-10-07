@@ -1,202 +1,235 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Video, Sparkles } from "lucide-react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Loader2, Video, Download } from "lucide-react";
 
-interface GeneratedVideo {
+interface VideoScene {
+  scene_number: number;
+  duration: string;
+  description: string;
+  text_overlay: string;
+  transition: string;
+  voiceover: string;
+  image_url: string | null;
+  error?: string;
+}
+
+interface GeneratedStoryboard {
   id: string;
-  url: string;
+  videoType: string;
+  totalScenes: number;
+  estimatedDuration: string;
+  scenes: VideoScene[];
+  instructions: string;
   prompt: string;
-  type: string;
 }
 
 const VideoGeneration = () => {
   const [prompt, setPrompt] = useState("");
   const [videoType, setVideoType] = useState<"reel" | "long">("reel");
+  const [style, setStyle] = useState("Realistic");
   const [isLoading, setIsLoading] = useState(false);
-  const [videos, setVideos] = useState<GeneratedVideo[]>([]);
+  const [generatedStoryboards, setGeneratedStoryboards] = useState<GeneratedStoryboard[]>([]);
 
-  const generateVideo = async () => {
+  const generateStoryboard = async () => {
     if (!prompt.trim()) {
-      toast.error("Please enter a description for your video");
+      toast.error("Please enter a prompt");
       return;
     }
 
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('generate-video', {
-        body: { prompt, videoType }
+      toast.info("Generating storyboard with images... This may take a minute");
+      
+      const { data, error } = await supabase.functions.invoke('generate-video-storyboard', {
+        body: { prompt, videoType, style }
       });
 
       if (error) throw error;
 
-      if (data?.videoUrl) {
-        const newVideo: GeneratedVideo = {
-          id: Date.now().toString(),
-          url: data.videoUrl,
-          prompt: prompt,
-          type: videoType,
-        };
-        setVideos(prev => [newVideo, ...prev]);
-        toast.success(`${videoType === 'reel' ? 'Reel' : 'Long-form video'} generated successfully!`);
-      }
+      const newStoryboard: GeneratedStoryboard = {
+        id: Date.now().toString(),
+        ...data,
+        prompt: prompt
+      };
+
+      setGeneratedStoryboards(prev => [newStoryboard, ...prev]);
+      toast.success(`Storyboard with ${data.totalScenes} scene images generated!`);
+      setPrompt("");
     } catch (error) {
-      console.error('Error generating video:', error);
-      toast.error(error instanceof Error ? error.message : "Failed to generate video. Please try again.");
+      console.error('Error generating storyboard:', error);
+      toast.error("Failed to generate storyboard");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="space-y-8">
-      {/* Input Section */}
-      <div className="max-w-4xl mx-auto space-y-6">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 space-y-6">
+    <div className="max-w-6xl mx-auto space-y-8 p-6">
+      <Card className="p-6 space-y-6">
+        <div>
+          <h2 className="text-2xl font-semibold mb-2">Generate Video Storyboard</h2>
+          <p className="text-muted-foreground">Create scene-by-scene images for CapCut video editing</p>
+        </div>
+
+        <div className="space-y-4">
           <div>
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
-              AI Video Generator
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              Generate reels or long-form videos for your social media accounts
-            </p>
-          </div>
-
-          <div className="space-y-3">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              Video Type
-            </label>
-            <Select value={videoType} onValueChange={(value: "reel" | "long") => setVideoType(value)} disabled={isLoading}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="reel">Short Reel (15-60s)</SelectItem>
-                <SelectItem value="long">Long-form Video (1-10min)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-3">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              Video Description
-            </label>
+            <Label htmlFor="video-prompt">Video Prompt</Label>
             <Textarea
-              placeholder="Describe the video you want to create... (e.g., 'A dynamic product showcase with transitions and music')"
+              id="video-prompt"
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
-              disabled={isLoading}
-              className="min-h-[120px] resize-none"
+              placeholder="Describe your video content... (e.g., Product launch announcement, Behind the scenes tour, Customer testimonial)"
+              className="min-h-[120px] mt-1"
             />
           </div>
 
-          <Button 
-            onClick={generateVideo} 
+          <div>
+            <Label htmlFor="video-type">Video Type</Label>
+            <select
+              id="video-type"
+              value={videoType}
+              onChange={(e) => setVideoType(e.target.value as "reel" | "long")}
+              className="w-full mt-1 rounded-md border border-input bg-background px-3 py-2"
+            >
+              <option value="reel">Short Reel/TikTok (15-30s, 3-4 scenes)</option>
+              <option value="long">Long Form Video (60-90s, 4-5 scenes)</option>
+            </select>
+          </div>
+
+          <div>
+            <Label>Style</Label>
+            <select
+              value={style}
+              onChange={(e) => setStyle(e.target.value)}
+              className="w-full mt-1 rounded-md border border-input bg-background px-3 py-2"
+            >
+              <option value="Realistic">Realistic</option>
+              <option value="Anime">Anime</option>
+              <option value="Cartoon">Cartoon</option>
+              <option value="3D">3D Render</option>
+              <option value="Minimalist">Minimalist</option>
+            </select>
+          </div>
+
+          <Button
+            onClick={generateStoryboard}
             disabled={isLoading || !prompt.trim()}
-            className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
-            size="lg"
+            className="w-full"
           >
             {isLoading ? (
               <>
-                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                Generating Video...
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Generating Storyboard...
               </>
             ) : (
               <>
-                <Sparkles className="mr-2 h-5 w-5" />
-                Generate Video
+                <Video className="w-4 h-4 mr-2" />
+                Generate Storyboard with Images
               </>
             )}
           </Button>
         </div>
-      </div>
+      </Card>
 
-      {/* Results Section */}
-      {isLoading && (
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-12">
-            <div className="flex flex-col items-center justify-center space-y-4">
-              <div className="relative">
-                <div className="w-16 h-16 border-4 border-purple-200 dark:border-purple-900 rounded-full"></div>
-                <div className="w-16 h-16 border-4 border-purple-600 dark:border-purple-400 rounded-full animate-spin border-t-transparent absolute top-0 left-0"></div>
-              </div>
-              <p className="text-lg font-medium text-gray-700 dark:text-gray-300">
-                Creating your video...
-              </p>
-              <p className="text-sm text-muted-foreground">
-                This may take several minutes
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {!isLoading && videos.length > 0 && (
-        <div className="max-w-6xl mx-auto space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-              Generated Videos ({videos.length})
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {videos.map((video) => (
-              <div key={video.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
-                <video 
-                  src={video.url} 
-                  controls 
-                  className="w-full aspect-video"
-                  preload="metadata"
-                />
-                <div className="p-4 space-y-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-medium px-2 py-1 rounded bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300">
-                      {video.type === 'reel' ? 'Reel' : 'Long-form'}
-                    </span>
-                  </div>
-                  <p className="text-sm text-muted-foreground line-clamp-2">
-                    {video.prompt}
+      {generatedStoryboards.length > 0 ? (
+        <div className="space-y-6">
+          {generatedStoryboards.map((storyboard) => (
+            <Card key={storyboard.id} className="p-6 space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-semibold text-lg">
+                    {storyboard.videoType === "reel" ? "Reel Storyboard" : "Long-Form Storyboard"}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">{storyboard.prompt}</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {storyboard.totalScenes} scenes • {storyboard.estimatedDuration}
                   </p>
-                  <div className="flex gap-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="flex-1"
-                      onClick={() => {
-                        const link = document.createElement('a');
-                        link.href = video.url;
-                        link.download = `video-${video.id}.mp4`;
-                        link.click();
-                      }}
-                    >
-                      Download
-                    </Button>
-                  </div>
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
-      )}
 
-      {!isLoading && videos.length === 0 && (
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-12">
-            <div className="text-center space-y-4">
-              <div className="w-20 h-20 mx-auto bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/20 dark:to-pink-900/20 rounded-full flex items-center justify-center">
-                <Video className="w-10 h-10 text-purple-600 dark:text-purple-400" />
+              <div className="bg-muted/50 p-4 rounded-lg">
+                <h4 className="font-medium mb-2 text-sm">📋 Instructions for CapCut/Video Editor:</h4>
+                <p className="text-xs text-muted-foreground whitespace-pre-line">{storyboard.instructions}</p>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-                No videos yet
-              </h3>
-              <p className="text-muted-foreground max-w-md mx-auto">
-                Enter a prompt above and click "Generate Video" to create your first AI-powered video
-              </p>
-            </div>
-          </div>
+              
+              <div className="space-y-6">
+                {storyboard.scenes.map((scene) => (
+                  <div key={scene.scene_number} className="border rounded-lg p-4 space-y-3">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h4 className="font-semibold">Scene {scene.scene_number}</h4>
+                        <p className="text-xs text-muted-foreground">{scene.duration}</p>
+                      </div>
+                      {scene.image_url && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            const link = document.createElement('a');
+                            link.href = scene.image_url!;
+                            link.download = `scene-${scene.scene_number}.png`;
+                            link.click();
+                          }}
+                        >
+                          <Download className="w-4 h-4 mr-2" />
+                          Download Scene
+                        </Button>
+                      )}
+                    </div>
+
+                    {scene.image_url ? (
+                      <div className="aspect-video bg-muted rounded-lg overflow-hidden">
+                        <img
+                          src={scene.image_url}
+                          alt={`Scene ${scene.scene_number}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="aspect-video bg-destructive/10 rounded-lg flex items-center justify-center">
+                        <p className="text-sm text-destructive">
+                          {scene.error || "Image generation failed"}
+                        </p>
+                      </div>
+                    )}
+
+                    <div className="space-y-2 text-sm">
+                      <div>
+                        <span className="font-medium">📝 Text Overlay:</span>
+                        <p className="text-muted-foreground">{scene.text_overlay}</p>
+                      </div>
+                      <div>
+                        <span className="font-medium">🎬 Description:</span>
+                        <p className="text-muted-foreground">{scene.description}</p>
+                      </div>
+                      <div>
+                        <span className="font-medium">🎤 Voiceover:</span>
+                        <p className="text-muted-foreground">{scene.voiceover}</p>
+                      </div>
+                      <div>
+                        <span className="font-medium">⚡ Transition:</span>
+                        <p className="text-muted-foreground capitalize">{scene.transition}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          ))}
         </div>
+      ) : (
+        <Card className="p-12 text-center">
+          <Video className="w-16 h-16 mx-auto mb-4 text-muted-foreground opacity-50" />
+          <h3 className="text-lg font-semibold mb-2">No storyboards generated yet</h3>
+          <p className="text-muted-foreground">
+            Create your first video storyboard with scene images for CapCut editing
+          </p>
+        </Card>
       )}
     </div>
   );

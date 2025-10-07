@@ -22,19 +22,39 @@ serve(async (req) => {
       throw new Error('Prompt is required');
     }
 
-    // Enhance prompt for social media posts with style (English only, professional design)
-    const socialMediaPrompt = `You are a professional AI graphic designer specialized in creating social media posters for marketing agencies. Generate a high-quality, realistic poster for ${prompt}${style && style !== 'Realistic' ? ` in ${style.toLowerCase()} style` : ''}. 
+    // Enhanced prompt for high-quality professional social media posts
+    const socialMediaPrompt = `You are an expert AI graphic designer for top marketing agencies. Create a stunning, professional-quality social media poster for: ${prompt}${style && style !== 'Realistic' ? ` in ${style.toLowerCase()} style` : ''}
 
-Requirements:
-- All text must be perfectly spelled, grammatically correct English
-- Use clean, modern, professional fonts
-- Text must be clearly readable and properly aligned
-- Make it eye-catching, modern, and optimized for Instagram/Facebook
-- No gibberish, no random text, no watermarks
-- Layout should look like a professional marketing poster
-- Include only the text explicitly mentioned in the prompt
-- If complex text is required, ensure accuracy or leave clean space for manual text addition
-- Output must look like a finished ad, ready for client use`;
+CRITICAL DESIGN REQUIREMENTS:
+Visual Excellence:
+- Use beautiful gradient backgrounds (purple, pink, gold, blue combinations work well)
+- Create depth with layered effects, glows, and soft lighting
+- Include professional 3D elements or decorative graphics when appropriate
+- Perfect composition with centered or well-balanced layouts
+- Add subtle particles, sparkles, or ambient effects for premium feel
+
+Typography:
+- Use large, bold, perfectly readable fonts for main text
+- Ensure flawless spelling and grammar
+- Properly align all text elements
+- Create visual hierarchy with font sizes
+- Use contrasting colors for text to ensure readability
+
+Professional Touches:
+- Include brand name/logo space at top or bottom
+- Add social media icons arranged artistically when relevant
+- Use professional color schemes (jewel tones, metallics, gradients)
+- Create a polished, finished look - ready for immediate posting
+- Add calls-to-action or taglines at bottom
+
+Style Guidelines:
+- Match the aesthetic quality of premium marketing agencies
+- Think: magazine cover quality, not amateur design
+- Every element should look intentional and professional
+- No watermarks, no gibberish text, no random elements
+- Output should look like it cost thousands to produce
+
+The final image should be Instagram/Facebook ready and look like it was created by a professional design studio.`;
 
     console.log('Generating social media post with Lovable AI:', socialMediaPrompt);
 
