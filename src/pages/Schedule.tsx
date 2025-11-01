@@ -15,7 +15,7 @@ const Schedule = () => {
   }, [location.state]);
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto px-3 sm:px-0">
       <ScheduleManager 
         prefilledImage={prefilledImage}
         prefilledPrompt={prefilledPrompt}

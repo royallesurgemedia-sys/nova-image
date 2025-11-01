@@ -69,11 +69,11 @@ const VideoGeneration = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8 p-6">
-      <Card className="p-6 space-y-6">
+    <div className="max-w-6xl mx-auto space-y-6 sm:space-y-8 px-3 sm:px-0">
+      <Card className="p-4 sm:p-6 space-y-4 sm:space-y-6">
         <div>
-          <h2 className="text-2xl font-semibold mb-2">Generate Video Storyboard</h2>
-          <p className="text-muted-foreground">Create scene-by-scene images for CapCut video editing</p>
+          <h2 className="text-xl sm:text-2xl font-semibold mb-2">Generate Video Storyboard</h2>
+          <p className="text-xs sm:text-sm text-muted-foreground">Create scene-by-scene images for CapCut video editing</p>
         </div>
 
         <div className="space-y-4">
@@ -137,15 +137,15 @@ const VideoGeneration = () => {
       </Card>
 
       {generatedStoryboards.length > 0 ? (
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           {generatedStoryboards.map((storyboard) => (
-            <Card key={storyboard.id} className="p-6 space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="font-semibold text-lg">
+            <Card key={storyboard.id} className="p-4 sm:p-6 space-y-3 sm:space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                <div className="min-w-0">
+                  <h3 className="font-semibold text-base sm:text-lg">
                     {storyboard.videoType === "reel" ? "Reel Storyboard" : "Long-Form Storyboard"}
                   </h3>
-                  <p className="text-sm text-muted-foreground">{storyboard.prompt}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2">{storyboard.prompt}</p>
                   <p className="text-xs text-muted-foreground mt-1">
                     {storyboard.totalScenes} scenes • {storyboard.estimatedDuration}
                   </p>
@@ -157,9 +157,9 @@ const VideoGeneration = () => {
                 <p className="text-xs text-muted-foreground whitespace-pre-line">{storyboard.instructions}</p>
               </div>
               
-              <div className="space-y-6">
+              <div className="space-y-4 sm:space-y-6">
                 {storyboard.scenes.map((scene) => (
-                  <div key={scene.scene_number} className="border rounded-lg p-4 space-y-3">
+                  <div key={scene.scene_number} className="border rounded-lg p-3 sm:p-4 space-y-2 sm:space-y-3">
                     <div className="flex items-start justify-between">
                       <div>
                         <h4 className="font-semibold">Scene {scene.scene_number}</h4>

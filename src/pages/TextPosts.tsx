@@ -84,41 +84,42 @@ const TextPosts = () => {
   };
 
   return (
-    <Card className="p-6 space-y-6">
+    <div className="max-w-4xl mx-auto px-3 sm:px-0">
+      <Card className="p-4 sm:p-6 space-y-4 sm:space-y-6">
       <div>
-        <h2 className="text-2xl font-semibold">Text Posts Generator</h2>
-        <p className="text-sm text-muted-foreground mt-1">Generate platform-optimized text-only captions and schedule them.</p>
+        <h2 className="text-xl sm:text-2xl font-semibold">Text Posts Generator</h2>
+        <p className="text-xs sm:text-sm text-muted-foreground mt-1">Generate platform-optimized text-only captions and schedule them.</p>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         <div>
-          <Label htmlFor="text-prompt">Prompt</Label>
+          <Label htmlFor="text-prompt" className="text-sm">Prompt</Label>
           <Input
             id="text-prompt"
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             placeholder="Describe your post idea..."
-            className="mt-1"
+            className="mt-1 text-sm"
           />
         </div>
 
-        <Button onClick={handleGenerateCaptions} disabled={isGenerating || !prompt} className="w-full" variant="outline">
+        <Button onClick={handleGenerateCaptions} disabled={isGenerating || !prompt} className="w-full text-sm" variant="outline">
           {isGenerating ? (
             <>
-              <Sparkles className="w-4 h-4 mr-2 animate-spin" />
+              <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 mr-2 animate-spin" />
               Generating...
             </>
           ) : (
             <>
-              <Sparkles className="w-4 h-4 mr-2" />
+              <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
               Generate Captions
             </>
           )}
         </Button>
 
         <div>
-          <Label className="mb-2 block">Select Platforms</Label>
-          <div className="grid grid-cols-2 gap-3">
+          <Label className="mb-2 block text-sm">Select Platforms</Label>
+          <div className="grid grid-cols-2 gap-2 sm:gap-3">
             {Object.entries(selectedPlatforms).map(([platform, selected]) => (
               <div key={platform} className="flex items-center space-x-2">
                 <Checkbox
@@ -128,7 +129,7 @@ const TextPosts = () => {
                     setSelectedPlatforms((prev) => ({ ...prev, [platform]: checked as boolean }))
                   }
                 />
-                <Label htmlFor={platform} className="capitalize cursor-pointer">
+                <Label htmlFor={platform} className="capitalize cursor-pointer text-xs sm:text-sm">
                   {platform}
                 </Label>
               </div>
@@ -139,22 +140,22 @@ const TextPosts = () => {
         {Object.entries(captions).map(([platform, caption]) => (
           selectedPlatforms[platform as keyof typeof selectedPlatforms] && (
             <div key={platform}>
-              <Label htmlFor={`caption-${platform}`} className="capitalize">
+              <Label htmlFor={`caption-${platform}`} className="capitalize text-sm">
                 {platform} Caption
               </Label>
               <Textarea
                 id={`caption-${platform}`}
                 value={caption}
                 onChange={(e) => setCaptions((prev) => ({ ...prev, [platform]: e.target.value }))}
-                className="mt-1 min-h-[100px]"
+                className="mt-1 min-h-[80px] sm:min-h-[100px] text-sm"
               />
             </div>
           )
         ))}
 
         <div>
-          <Label htmlFor="schedule-time" className="flex items-center gap-2">
-            <Calendar className="w-4 h-4" />
+          <Label htmlFor="schedule-time" className="flex items-center gap-2 text-sm">
+            <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
             Schedule Time
           </Label>
           <Input
@@ -162,12 +163,12 @@ const TextPosts = () => {
             type="datetime-local"
             value={scheduleTime}
             onChange={(e) => setScheduleTime(e.target.value)}
-            className="mt-1"
+            className="mt-1 text-sm"
           />
         </div>
 
-        <Button onClick={handleSchedule} disabled={!scheduleTime} className="w-full">
-          <Clock className="w-4 h-4 mr-2" />
+        <Button onClick={handleSchedule} disabled={!scheduleTime} className="w-full text-sm">
+          <Clock className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
           Schedule Text Post
         </Button>
 
@@ -176,6 +177,7 @@ const TextPosts = () => {
         </p>
       </div>
     </Card>
+    </div>
   );
 };
 

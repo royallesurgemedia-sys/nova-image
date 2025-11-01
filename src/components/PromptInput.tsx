@@ -17,7 +17,7 @@ export const PromptInput = ({ value, onChange, disabled, className }: PromptInpu
         onChange={(e) => onChange(e.target.value)}
         disabled={disabled}
         placeholder="Describe your social media post... (e.g., Modern coffee shop announcement, Product launch banner, Team celebration photo)"
-        className="relative min-h-[120px] bg-card/80 backdrop-blur-md border-border/50 focus:border-primary resize-none text-base transition-all duration-300"
+        className="relative min-h-[100px] sm:min-h-[120px] bg-card/80 backdrop-blur-md border-border/50 focus:border-primary resize-none text-sm sm:text-base transition-all duration-300"
       />
     </div>
   );

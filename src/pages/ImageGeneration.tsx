@@ -62,10 +62,10 @@ const ImageGeneration = () => {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {/* Input Section */}
-      <div className="max-w-4xl mx-auto space-y-6">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 space-y-6">
+      <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-xl p-4 sm:p-6 md:p-8 space-y-4 sm:space-y-6">
           <PromptInput 
             value={prompt} 
             onChange={setPrompt}
@@ -83,7 +83,7 @@ const ImageGeneration = () => {
             />
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             <GenerateButton 
               onClick={generateImage} 
               isLoading={isLoading}
@@ -101,7 +101,7 @@ const ImageGeneration = () => {
       {/* Results Section */}
       {isLoading && (
         <div className="max-w-4xl mx-auto">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-12">
+          <div className="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-xl p-6 sm:p-8 md:p-12">
             <div className="flex flex-col items-center justify-center space-y-4">
               <div className="relative">
                 <div className="w-16 h-16 border-4 border-purple-200 dark:border-purple-900 rounded-full"></div>
@@ -119,9 +119,9 @@ const ImageGeneration = () => {
       )}
 
       {!isLoading && images.length > 0 && (
-        <div className="max-w-6xl mx-auto space-y-6">
+        <div className="max-w-6xl mx-auto space-y-4 sm:space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">
               Generated Images ({images.length})
             </h2>
           </div>
@@ -131,7 +131,7 @@ const ImageGeneration = () => {
 
       {!isLoading && images.length === 0 && (
         <div className="max-w-4xl mx-auto">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-12">
+          <div className="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-xl p-6 sm:p-8 md:p-12">
             <div className="text-center space-y-4">
               <div className="w-20 h-20 mx-auto bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/20 dark:to-pink-900/20 rounded-full flex items-center justify-center">
                 <svg className="w-10 h-10 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

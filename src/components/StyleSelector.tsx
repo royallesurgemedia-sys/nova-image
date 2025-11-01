@@ -25,9 +25,9 @@ export const StyleSelector = ({ value, onChange, disabled }: StyleSelectorProps)
     <div className="relative group">
       <div className="absolute -inset-0.5 bg-gradient-ai rounded-lg opacity-20 group-hover:opacity-40 transition-opacity blur-sm" />
       <Select value={value} onValueChange={onChange} disabled={disabled}>
-        <SelectTrigger className="relative bg-card/80 backdrop-blur-md border-border/50 focus:border-primary h-12">
-          <div className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-primary" />
+        <SelectTrigger className="relative bg-card/80 backdrop-blur-md border-border/50 focus:border-primary h-10 sm:h-12 text-sm sm:text-base">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 text-primary flex-shrink-0" />
             <SelectValue placeholder="Select a style" />
           </div>
         </SelectTrigger>
@@ -36,7 +36,7 @@ export const StyleSelector = ({ value, onChange, disabled }: StyleSelectorProps)
             <SelectItem 
               key={style} 
               value={style}
-              className="focus:bg-primary/10 cursor-pointer"
+              className="focus:bg-primary/10 cursor-pointer text-sm"
             >
               {style}
             </SelectItem>

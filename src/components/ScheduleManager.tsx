@@ -173,19 +173,20 @@ export const ScheduleManager = ({ prefilledImage, prefilledPrompt, onClearPrefil
   };
 
   return (
-    <Card className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
+    <Card className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h2 className="text-2xl font-semibold">Schedule Posts - Royal Surge Media</h2>
-          <p className="text-sm text-muted-foreground mt-1">Generate content, set captions, then schedule</p>
+          <h2 className="text-xl sm:text-2xl font-semibold">Schedule Posts - Royal Surge Media</h2>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-1">Generate content, set captions, then schedule</p>
         </div>
         <Button
           onClick={handleRunNow}
           disabled={isLoading}
           variant="outline"
           size="sm"
+          className="w-full sm:w-auto text-xs sm:text-sm"
         >
-          <Play className="w-4 h-4 mr-2" />
+          <Play className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
           Run Scheduled Posts Now
         </Button>
       </div>
@@ -238,8 +239,8 @@ export const ScheduleManager = ({ prefilledImage, prefilledPrompt, onClearPrefil
             </div>
 
             <div>
-              <Label className="mb-2 block">Select Platforms</Label>
-              <div className="grid grid-cols-2 gap-3">
+              <Label className="mb-2 block text-sm">Select Platforms</Label>
+              <div className="grid grid-cols-2 gap-2 sm:gap-3">
                 {Object.entries(selectedPlatforms).map(([platform, selected]) => (
                   <div key={platform} className="flex items-center space-x-2">
                     <Checkbox
@@ -249,7 +250,7 @@ export const ScheduleManager = ({ prefilledImage, prefilledPrompt, onClearPrefil
                         setSelectedPlatforms((prev) => ({ ...prev, [platform]: checked as boolean }))
                       }
                     />
-                    <Label htmlFor={platform} className="capitalize cursor-pointer">
+                    <Label htmlFor={platform} className="capitalize cursor-pointer text-xs sm:text-sm">
                       {platform}
                     </Label>
                   </div>
@@ -301,53 +302,58 @@ export const ScheduleManager = ({ prefilledImage, prefilledPrompt, onClearPrefil
         )}
       </div>
 
-      <div className="border-t pt-6">
-        <h3 className="text-lg font-semibold mb-4">Royal Surge Media Social Accounts</h3>
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+      <div className="border-t pt-4 sm:pt-6">
+        <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Royal Surge Media Social Accounts</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 sm:gap-3">
           <Button
             variant="outline"
             size="sm"
-            className="flex items-center gap-2"
+            className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm"
             onClick={() => window.open(SOCIAL_MEDIA_ACCOUNTS.twitter, '_blank')}
           >
-            <Twitter className="w-4 h-4" />
-            Twitter
+            <Twitter className="w-3 h-3 sm:w-4 sm:h-4" />
+            <span className="hidden sm:inline">Twitter</span>
+            <span className="sm:hidden">X</span>
           </Button>
           <Button
             variant="outline"
             size="sm"
-            className="flex items-center gap-2"
+            className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm"
             onClick={() => window.open(SOCIAL_MEDIA_ACCOUNTS.instagram, '_blank')}
           >
-            <Instagram className="w-4 h-4" />
-            Instagram
+            <Instagram className="w-3 h-3 sm:w-4 sm:h-4" />
+            <span className="hidden sm:inline">Instagram</span>
+            <span className="sm:hidden">IG</span>
           </Button>
           <Button
             variant="outline"
             size="sm"
-            className="flex items-center gap-2"
+            className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm"
             onClick={() => window.open(SOCIAL_MEDIA_ACCOUNTS.facebook, '_blank')}
           >
-            <Facebook className="w-4 h-4" />
-            Facebook
+            <Facebook className="w-3 h-3 sm:w-4 sm:h-4" />
+            <span className="hidden sm:inline">Facebook</span>
+            <span className="sm:hidden">FB</span>
           </Button>
           <Button
             variant="outline"
             size="sm"
-            className="flex items-center gap-2"
+            className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm"
             onClick={() => window.open(SOCIAL_MEDIA_ACCOUNTS.youtube, '_blank')}
           >
-            <Youtube className="w-4 h-4" />
-            YouTube
+            <Youtube className="w-3 h-3 sm:w-4 sm:h-4" />
+            <span className="hidden sm:inline">YouTube</span>
+            <span className="sm:hidden">YT</span>
           </Button>
           <Button
             variant="outline"
             size="sm"
-            className="flex items-center gap-2"
+            className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm"
             onClick={() => window.open(SOCIAL_MEDIA_ACCOUNTS.linkedin, '_blank')}
           >
-            <Linkedin className="w-4 h-4" />
-            LinkedIn
+            <Linkedin className="w-3 h-3 sm:w-4 sm:h-4" />
+            <span className="hidden sm:inline">LinkedIn</span>
+            <span className="sm:hidden">LI</span>
           </Button>
         </div>
         <p className="text-xs text-muted-foreground mt-3">
