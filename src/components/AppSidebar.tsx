@@ -1,4 +1,4 @@
-import { Image, Video, Calendar } from "lucide-react";
+import { Image, Video, Calendar, FileText } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import {
   Sidebar,
@@ -15,6 +15,7 @@ import {
 const items = [
   { title: "Image Generation", url: "/", icon: Image },
   { title: "Video Generation", url: "/video", icon: Video },
+  { title: "Text Posts Generator", url: "/text", icon: FileText },
   { title: "Schedule Posts", url: "/schedule", icon: Calendar },
 ];
 

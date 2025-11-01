@@ -9,6 +9,7 @@ import { ModeToggle } from "@/components/ModeToggle";
 import ImageGeneration from "./pages/ImageGeneration";
 import VideoGeneration from "./pages/VideoGeneration";
 import Schedule from "./pages/Schedule";
+import TextPosts from "./pages/TextPosts";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -52,6 +53,7 @@ const App = () => (
               <Routes>
                 <Route path="/" element={<Layout><ImageGeneration /></Layout>} />
                 <Route path="/video" element={<Layout><VideoGeneration /></Layout>} />
+                <Route path="/text" element={<Layout><TextPosts /></Layout>} />
                 <Route path="/schedule" element={<Layout><Schedule /></Layout>} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
