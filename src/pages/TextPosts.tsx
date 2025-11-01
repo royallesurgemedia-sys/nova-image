@@ -143,7 +143,7 @@ const TextPosts = () => {
                 {platform} Caption
               </Label>
               <Textarea
-                id={`caption-${platform}`]
+                id={`caption-${platform}`}
                 value={caption}
                 onChange={(e) => setCaptions((prev) => ({ ...prev, [platform]: e.target.value }))}
                 className="mt-1 min-h-[100px]"
