@@ -16,7 +16,7 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    console.log('Checking for scheduled posts to run...');
+    console.log('Checking for scheduled posts to mark as executed...');
 
     // Get active scheduled posts that should run now
     const { data: scheduledPosts, error: fetchError } = await supabase
@@ -34,17 +34,7 @@ serve(async (req) => {
     const results = [];
     for (const post of scheduledPosts || []) {
       try {
-        // Call the generate-image function
-        const { data: imageData, error: generateError } = await supabase.functions.invoke('generate-image', {
-          body: {
-            prompt: post.prompt,
-            style: post.style
-          }
-        });
-
-        if (generateError) throw generateError;
-
-        // Update last_run timestamp
+        // Simply mark the post as executed without posting to any platform
         await supabase
           .from('scheduled_posts')
           .update({ last_run: new Date().toISOString() })
@@ -53,10 +43,10 @@ serve(async (req) => {
         results.push({
           id: post.id,
           status: 'success',
-          image: imageData?.image
+          message: 'Post marked as executed (no platform posting)'
         });
 
-        console.log(`Successfully generated image for post ${post.id}`);
+        console.log(`Successfully marked post ${post.id} as executed`);
       } catch (error) {
         console.error(`Error processing post ${post.id}:`, error);
         results.push({
