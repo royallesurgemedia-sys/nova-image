@@ -177,7 +177,7 @@ export const ScheduleManager = ({ prefilledImage, prefilledPrompt, onClearPrefil
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h2 className="text-xl sm:text-2xl font-semibold">Schedule Posts - Royal Surge Media</h2>
-          <p className="text-xs sm:text-sm text-muted-foreground mt-1">Generate images & captions for scheduling (posts won't be auto-published)</p>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-1">Schedule posts to auto-publish via Ayrshare (20 posts/month)</p>
         </div>
         <Button
           onClick={handleRunNow}
